@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iPhone Calculator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* Center the calculator on the screen */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: black; /* Match the calculator background for a seamless look */
+    }
+
+    /* General font styling */
+    * {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    /* Container for iPhone calculator */
+    .calculator {
+      width: 90%; /* Set width to a percentage for better scaling */
+      max-width: 375px; /* Maximum width similar to iPhone 11 */
+      height: auto; /* Allow auto height */
+      background-color: black;
+      border-radius: 40px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start; /* Start from the top */
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Blank space at the top */
+    .top-space {
+      height: 80px; /* Height of the top blank space */
+    }
+
+    /* Display screen */
+    .display {
+      height: 85px; /* Height of the display */
+      color: white;
+      font-size: 4em; /* Larger font size for display */
+      text-align: right;
+      padding: 10px; /* Padding within the display */
+      border-radius: 15px;
+      background-color: transparent; /* Transparent background */
+      margin-bottom: 10px; /* Margin below display */
+    }
+
+    /* Calculator button grid */
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    /* Styling for individual buttons */
+    .button {
+      color: #ffffff; /* White text for all buttons */
+      font-size: 2.3em; /* Larger font size for all buttons */
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 90px; /* Height of buttons */
+      width: 90px; /* Width of buttons */
+      cursor: pointer;
+      transition: transform 0.1s ease; /* Smooth scaling effect */
+    }
+
+    /* Button press effect */
+    .button:active {
+      transform: scale(0.95); /* Scale down on press */
+    }
+
+    /* Flicker effect */
+    .flicker {
+      animation: flicker 0.1s linear;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    /* Dark gray for AC, +/- and % buttons */
+    .button-clear,
+    .button-special {
+      background-color: #5c5c5e;
+    }
+
+    /* Darker gray for number buttons */
+    .button-number {
+      background-color: #2a2a2c;
+    }
+
+    /* Orange for operator buttons */
+    .button-operator,
+    .button-equals {
+      background-color: #ff9f0a;
+      font-size: 2.5em; /* Extra large font size for symbols */
+      line-height: 1;
+    }
+
+    /* Calculator icon button styling */
+    .button-calculator {
+      background-color: #2a2a2c; /* Match the number button color */
+      border-radius: 50%; /* Make it circular */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 90px; /* Same height as other buttons */
+      width: 90px; /* Same width as other buttons */
+      cursor: pointer;
+      transition: transform 0.1s ease; /* Smooth scaling effect */
+      color: #ffffff; /* White text */
+      font-size: 2em; /* Icon size */
+    }
+
+    .button-calculator:active {
+      transform: scale(0.95); /* Scale down on press */
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <!-- Blank space at the top -->
+    <div class="top-space"></div>
+
+    <!-- Display screen (Single Result Box) -->
+    <div class="display" id="display">0</div> <!-- Starts with 0 -->
+
+    <!-- Calculator buttons -->
+    <div class="buttons">
+      <div class="button button-clear" onclick="clearDisplay(this)">AC</div>
+      <div class="button button-special" onclick="appendToDisplay(this, '+/-')">+/-</div>
+      <div class="button button-special" onclick="appendToDisplay(this, '%')">%</div>
+      <div class="button button-operator" onclick="appendToDisplay(this, '÷')">÷</div>
+
+      <div class="button button-number" onclick="appendToDisplay(this, '7')">7</div>
+      <div class="button button-number" onclick="appendToDisplay(this, '8')">8</div>
+      <div class="button button-number" onclick="appendToDisplay(this, '9')">9</div>
+      <div class="button button-operator" onclick="appendToDisplay(this, '×')">×</div>
+
+      <div class="button button-number" onclick="appendToDisplay(this, '4')">4</div>
+      <div class="button button-number" onclick="appendToDisplay(this, '5')">5</div>
+      <div class="button button-number" onclick="appendToDisplay(this, '6')">6</div>
+      <div class="button button-operator" onclick="appendToDisplay(this, '−')">−</div>
+
+      <div class="button button-number" onclick="appendToDisplay(this, '1')">1</div>
+      <div class="button button-number" onclick="appendToDisplay(this, '2')">2</div>
+      <div class="button button-number" onclick="appendToDisplay(this, '3')">3</div>
+      <div class="button button-operator" onclick="appendToDisplay(this, '+')">+</div>
+
+      <div class="button button-calculator" onclick="openCalculator()">
+        <i class="fas fa-calculator"></i> <!-- Font Awesome calculator icon -->
+      </div> <!-- Circular button for calculator -->
+      <div class="button button-number" onclick="appendToDisplay(this, '0')">0</div>
+      <div class="button button-number" onclick="appendToDisplay(this, '.')">.</div>
+      <div class="button button-equals" onclick="calculateResult(this)">=</div>
+    </div>
+  </div>
+
+  <script>
+    const display = document.getElementById('display');
+
+    function appendToDisplay(button, value) {
+      // If the display shows 0, replace it with the new value
+      if (display.innerText === '0') {
+        display.innerText = value;
+      } else {
+        display.innerText += value; // Otherwise, append the value
+      }
+      button.classList.add('flicker'); // Trigger flicker effect on button press
+      setTimeout(() => {
+        button.classList.remove('flicker'); // Remove flicker class after animation
+      }, 100); // Duration of flicker effect
+    }
+
+    function clearDisplay(button) {
+      display.innerText = '0'; // Clear the display
+      button.classList.add('flicker'); // Trigger flicker effect on button press
+      setTimeout(() => {
+        button.classList.remove('flicker'); // Remove flicker class after animation
+      }, 100); // Duration of flicker effect
+    }
+
+    function calculateResult(button) {
+      // Display "I LOVE YOU" regardless of the calculation
+      display.innerText = "I LOVE YOU"; // Set display to "I LOVE YOU"
+      button.classList.add('flicker'); // Trigger flicker effect on button press
+      setTimeout(() => {
+        button.classList.remove('flicker'); // Remove flicker class after animation
+      }, 100); // Duration of flicker effect
+    }
+
+    function openCalculator() {
+      // Action for the calculator icon button (optional)
+      alert('Calculator icon clicked!'); // Placeholder action
+    }
+  </script>
+</body>
+</html>
